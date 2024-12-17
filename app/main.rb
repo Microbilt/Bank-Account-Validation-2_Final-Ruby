@@ -1,45 +1,16 @@
-# Bank Account Validation 2 Final Client
+require 'json'
+require 'net/http'
+require 'library'
+require_relative '../Library/lib/BankAccountValidation2Client'
+require_relative '../Library/lib/helpers/EnvironmentType'
+require_relative '../Library/lib/clients/ACHCheckPrescreenLiteClient'
+require_relative '../Library/lib/model/model'
 
-A Ruby client for consuming the Microbilt Bank Account Validation 2 Final API.
 
-API page - https://developer.microbilt.com/api/ACHCheckPrescreenLite
+bank_account_validation_client = BankAccountValidation::BankAccountValidation2Client.new("You_client_id", "You_client_id", EnvironmentType::Sandbox)
 
-or more about APIs You can see on [Microbilt Developer Portal](https://developer.microbilt.com/)
+puts "Test GetReport:"
 
-## APIs in this plan:
-
-[ACHCheckPrescreenLite](https://developer.microbilt.com/api/ACHCheckPrescreenLite)
-
-# Installation
-
-`composer require Microbilt/Bank-Account-Validation-2_Final-Ruby`
-
-# Quick Start
-
-```
-bank_account_validation_client = BankAccountValidation::BankAccountValidation2Client.new("You_client_id", "You_client_id")
-```
-# Configuration
-
-`client_id` required
-
-`client_secret` required
-
-`EnvironmentType` optional (defaults to Production). Other option is Sandbox. 
-
-# Usage
-See https://developer.microbilt.com/api/ProfessionalLicenseSearch for the necessary parameters to pass in to each function.
-For report created request model 
-```
-person_name = PersonName.new(
-  first_name: "John",
-  last_name: "Green"
-)
-professional_license_search_request = ProfessionalLicenseSearchRequestModel.new(person_name: person_name, state_prov: "TX").to_h.to_json
-```
-See https://developer.microbilt.com/api/ACHCheckPrescreenLite for the necessary parameters to pass in to each function.
-For GetReport created request model 
-```
 report_request_model = ACHCheckPrescreenLiteReportRequstModel.new(
   person_info: PersonInfo.new(
     person_name: PersonName.new(first_name: "Kevin", last_name: "Williams")
@@ -89,9 +60,19 @@ report_request_model = ACHCheckPrescreenLiteReportRequstModel.new(
 )
 
 report_request_model_json = JSON.generate(report_request_model.to_h)
-```
-For GetReportPerformance created request model 
-```
+puts report_request_model_json
+
+report = bank_account_validation_client.ach_check_prescreen_light_client.get_report(report_request_model_json)
+puts "GetReport = #{report}"
+
+puts "Test GetArchiveReport:"
+archive_report = bank_account_validation_client.ach_check_prescreen_light_client.get_archive_report("0B75ABF4-0360-48BC-816D-6687FB7089F0")
+puts "GetArchiveReport = #{archive_report}"
+
+
+puts "Test get_report_performance:"
+
+# Create an instance of ReportPerformanceRequest
 report_performance_request = ACHCheckPrescreenLiteReportPerfomanceRequstModel.new(
   check_info: Checkinfo.new(
     account_number: "1007",
@@ -132,5 +113,9 @@ report_performance_request = ACHCheckPrescreenLiteReportPerfomanceRequstModel.ne
   )
 )
 
+# Convert the object to a hash and serialize to JSON
 report_performance_request_json = JSON.pretty_generate(report_performance_request.to_h)
-```
+puts report_performance_request_json
+
+report = bank_account_validation_client.ach_check_prescreen_light_client.get_report_performance(report_performance_request_json)
+puts "GetReportPerformance = #{report}"
